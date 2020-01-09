@@ -1,6 +1,6 @@
 # Minimal X-Macro Generator
 
-Extremely minimal X-Macros to extend C structs with basic cross-platform serialization and JSON string conversion.
+Extremely minimal [X-Macros](https://en.wikipedia.org/wiki/X_Macro) to extend C structs with basic cross-platform serialization and JSON string conversion.
 
 ## Features
 
