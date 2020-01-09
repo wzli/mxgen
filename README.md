@@ -21,11 +21,11 @@ See [Example](./test.c):
 #include "mxgen.h"
 
 /* For the equivalent struct definition
-  typedef struct {
-  int32_t int_member;
-  float float_array[5];
-  StructB nested_struct;
-  } StructA;
+typedef struct {
+    int32_t int_member;
+    float float_array[5];
+    StructB nested_struct;
+}   StructA;
 */
 #define STRUCT_StructA(X)      \
     X(int32_t, int_member, )   \
