@@ -53,7 +53,11 @@ int main() {
     assert(!StructB_compare(&struct_c.b[0], &struct_c.b[1]));
 
     // test json string
+    StructA_to_json(&struct_c.a, buf);
+    printf("StructA: %s\n\n", buf);
+    StructB_to_json(&struct_c.b[0], buf);
+    printf("StructB: %s\n\n", buf);
     StructC_to_json(&struct_c, buf);
-    printf("%s\n", buf);
+    printf("StructC: %s\n", buf);
     return 0;
 }
