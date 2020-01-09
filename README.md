@@ -31,7 +31,7 @@ typedef struct {
     X(int32_t, int_member, )   \
     X(float, float_array, [5]) \
     X(StructB, nested_struct, )
-    GEN_STRUCT(StructA);
+GEN_STRUCT(StructA);
 
 // the following functions are automatically generated 
 int StructA_compare(const StructA* a, const StructA* b);
