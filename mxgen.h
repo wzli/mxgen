@@ -5,20 +5,32 @@
 
 #define GEN_STRUCT(STRUCT)         \
     GEN_STRUCT_DEFINITION(STRUCT); \
-    GEN_TO_JSON(STRUCT);           \
+    GEN_COMPARE(STRUCT);           \
     GEN_SERIALIZE(STRUCT);         \
-    GEN_DESERIALIZE(STRUCT);
+    GEN_DESERIALIZE(STRUCT);       \
+    GEN_TO_JSON(STRUCT);
 
 #define GEN_STRUCT_FIELD(TYPE, NAME, ARRAY) TYPE NAME ARRAY;
 #define GEN_STRUCT_DEFINITION(STRUCT) typedef struct { STRUCT_##STRUCT(GEN_STRUCT_FIELD) } STRUCT
 
-#define GEN_SERIALIZE_FIELD(TYPE, NAME, ARRAY)                       \
-    for (uint32_t i = 0; i < sizeof(TYPE ARRAY) / sizeof(TYPE); ++i) \
+#define GEN_COMPARE_FIELD(TYPE, NAME, ARRAY)                                  \
+    for (size_t i = 0; !result && i < sizeof(TYPE ARRAY) / sizeof(TYPE); ++i) \
+        result |= TYPE##_compare((TYPE*) &a->NAME + i, (TYPE*) &b->NAME + i);
+
+#define GEN_SERIALIZE_FIELD(TYPE, NAME, ARRAY)                     \
+    for (size_t i = 0; i < sizeof(TYPE ARRAY) / sizeof(TYPE); ++i) \
         len += TYPE##_serialize((TYPE*) &struc->NAME + i, buf + len);
 
-#define GEN_DESERIALIZE_FIELD(TYPE, NAME, ARRAY)                     \
-    for (uint32_t i = 0; i < sizeof(TYPE ARRAY) / sizeof(TYPE); ++i) \
+#define GEN_DESERIALIZE_FIELD(TYPE, NAME, ARRAY)                   \
+    for (size_t i = 0; i < sizeof(TYPE ARRAY) / sizeof(TYPE); ++i) \
         len += TYPE##_deserialize((TYPE*) &struc->NAME + i, buf + len);
+
+#define GEN_COMPARE(STRUCT)                                                \
+    static inline int STRUCT##_compare(const STRUCT* a, const STRUCT* b) { \
+        int result = 0;                                                    \
+        STRUCT_##STRUCT(GEN_COMPARE_FIELD);                                \
+        return result;                                                     \
+    }
 
 #define GEN_SERIALIZE(STRUCT)                                                 \
     static inline int STRUCT##_serialize(const STRUCT* struc, uint8_t* buf) { \
@@ -40,13 +52,13 @@
     len += strlen((char*) &struc->NAME);     \
     buf[len++] = '"';
 
-#define GEN_JSON_LIST(TYPE, NAME, ARRAY)                               \
-    buf[len++] = '[';                                                  \
-    for (uint32_t i = 0; i < sizeof(TYPE ARRAY) / sizeof(TYPE); ++i) { \
-        len += TYPE##_to_json((TYPE*) &struc->NAME + i, buf + len);    \
-        buf[len++] = ',';                                              \
-        buf[len++] = ' ';                                              \
-    }                                                                  \
+#define GEN_JSON_LIST(TYPE, NAME, ARRAY)                             \
+    buf[len++] = '[';                                                \
+    for (size_t i = 0; i < sizeof(TYPE ARRAY) / sizeof(TYPE); ++i) { \
+        len += TYPE##_to_json((TYPE*) &struc->NAME + i, buf + len);  \
+        buf[len++] = ',';                                            \
+        buf[len++] = ' ';                                            \
+    }                                                                \
     buf[--len - 1] = ']';
 
 #define GEN_JSON_FIELD(TYPE, NAME, ARRAY)                       \
@@ -71,9 +83,6 @@
         return len;                                                      \
     }
 
-#define IS_LITTLE_ENDIAN ((union {uint32_t x; uint8_t c;}){1}.c)
-#define SERIALIZE_MEMCPY(X, Y, N) IS_LITTLE_ENDIAN ? memcpy(X, Y, N) : reverse_memcpy(X, Y, N)
-
 #define GEN_PRIMITIVE(TYPE, FORMAT)                                         \
     static inline int TYPE##_serialize(const TYPE* struc, uint8_t* buf) {   \
         SERIALIZE_MEMCPY(buf, struc, sizeof(TYPE));                         \
@@ -85,7 +94,11 @@
     }                                                                       \
     static inline int TYPE##_to_json(const TYPE* struc, char* buf) {        \
         return sprintf(buf, "\"" FORMAT "\"", *struc);                      \
-    }
+    }                                                                       \
+    static inline int TYPE##_compare(const TYPE* a, const TYPE* b) { return (int) (*b - *a); }
+
+#define IS_LITTLE_ENDIAN ((union { uint32_t x; uint8_t c;}){1}.c)
+#define SERIALIZE_MEMCPY(X, Y, N) IS_LITTLE_ENDIAN ? memcpy(X, Y, N) : reverse_memcpy(X, Y, N)
 
 static inline void* reverse_memcpy(void* dst, const void* src, size_t n) {
     for (size_t i = 0; i < n; ++i)
@@ -102,5 +115,5 @@ GEN_PRIMITIVE(int8_t, "%d")
 GEN_PRIMITIVE(int16_t, "%d")
 GEN_PRIMITIVE(int32_t, "%d")
 GEN_PRIMITIVE(int64_t, "%ld")
-GEN_PRIMITIVE(float, "%f")
-GEN_PRIMITIVE(double, "%f")
+GEN_PRIMITIVE(float, "%g")
+GEN_PRIMITIVE(double, "%g")
