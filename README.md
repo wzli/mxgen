@@ -2,7 +2,7 @@
 
 Extremely minimal [X-Macros](https://en.wikipedia.org/wiki/X_Macro) to extend C structs with basic cross-platform serialization and JSON string conversion. 
 
-# Use Case
+## Use Case
 - Originally part of an embedded ecosystem, to facilitate message passing between microcontrollers on top of byte transmission protocols.
 - JSON string generation is primarily intended for automated debug prints and logging, with the added benefit of WebAPI compatibility.
 - Combine message definition and code generation into concise header files that are portable and easily shared in cross-platform application.
