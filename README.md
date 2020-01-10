@@ -1,6 +1,11 @@
 # Minimal X-Macro Generator
 
-Extremely minimal [X-Macros](https://en.wikipedia.org/wiki/X_Macro) to extend C structs with basic cross-platform serialization and JSON string conversion.
+Extremely minimal [X-Macros](https://en.wikipedia.org/wiki/X_Macro) to extend C structs with basic cross-platform serialization and JSON string conversion. 
+
+# Use Case
+- Originally part of an embedded ecosystem, to facilitate message passing between microcontrollers on top of byte transmission protocols.
+- JSON string generation is primarily intended for automated debug prints and logging, with the added benefit of WebAPI compatibility.
+- Combine message definition and code generation into concise header files that are portable and easily shared in cross-platform application.
 
 ## Features
 
@@ -10,6 +15,7 @@ Extremely minimal [X-Macros](https://en.wikipedia.org/wiki/X_Macro) to extend C 
 - Supports structs, nested structs, and array members.
 - Header only, just include [mxgen.h](./mxgen.h).
 - Bare minimal, 120 lines of code total.
+- No external dependencies.
 - No dynamic memory usage.
 - C99 compliant.
 
