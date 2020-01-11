@@ -106,7 +106,7 @@ static inline void* reverse_memcpy(void* dst, const void* src, size_t n) {
     return dst;
 }
 
-GEN_PRIMITIVE(char, (*struc == '\0') ? "null" : "\"%c\"")
+GEN_PRIMITIVE(char, (*struc) ? "\"%c\"" : "null")
 GEN_PRIMITIVE(uint8_t, "%u")
 GEN_PRIMITIVE(uint16_t, "%u")
 GEN_PRIMITIVE(uint32_t, "%u")
