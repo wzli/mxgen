@@ -9,9 +9,10 @@ typedef struct {
 } StructA;
 */
 #define STRUCT_StructA(FIELD) \
-    FIELD(int8_t, i, )        \
+    FIELD(uint8_t, i, )       \
+    FIELD(char, c, )          \
     FIELD(double, d, [3])     \
-    FIELD(char, c, [10])
+    FIELD(char, s, [10])
 GEN_STRUCT(StructA);
 
 /* Nested Struct
@@ -41,13 +42,13 @@ GEN_STRUCT(StructC);
 int main() {
     // initialize variables
     StructC struct_c = {};
-    struct_c.a = (StructA){1, {2.5, 0.3, 99.9}, "hello"};
-    struct_c.b[0] = (StructB){555555, struct_c.a, {{}, struct_c.a}};
+    struct_c.a = (StructA){1, 'K', {2.5, -0.3, 99.9}, "hello"};
+    struct_c.b[0] = (StructB){-555555, struct_c.a, {{}, struct_c.a}};
     char buf[600] = {};
 
     // test serialize and deserialize
-    StructB_serialize(&struct_c.b[0], buf);
-    StructB_deserialize(&struct_c.b[1], buf);
+    StructB_serialize(&struct_c.b[0], (uint8_t*)buf);
+    StructB_deserialize(&struct_c.b[1], (uint8_t*)buf);
 
     // test comparison
     assert(!StructB_compare(&struct_c.b[0], &struct_c.b[1]));

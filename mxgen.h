@@ -93,7 +93,7 @@
         return sizeof(TYPE);                                                \
     }                                                                       \
     static inline int TYPE##_to_json(const TYPE* struc, char* buf) {        \
-        return sprintf(buf, "\"" FORMAT "\"", *struc);                      \
+        return sprintf(buf, FORMAT, *struc);                                \
     }                                                                       \
     static inline int TYPE##_compare(const TYPE* a, const TYPE* b) { return (int) (*b - *a); }
 
@@ -106,7 +106,7 @@ static inline void* reverse_memcpy(void* dst, const void* src, size_t n) {
     return dst;
 }
 
-GEN_PRIMITIVE(char, "%c")
+GEN_PRIMITIVE(char, (*struc == '\0') ? "null" : "\"%c\"")
 GEN_PRIMITIVE(uint8_t, "%u")
 GEN_PRIMITIVE(uint16_t, "%u")
 GEN_PRIMITIVE(uint32_t, "%u")
