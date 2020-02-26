@@ -12,7 +12,8 @@ typedef struct {
     FIELD(uint8_t, i, )       \
     FIELD(char, c, )          \
     FIELD(double, d, [3])     \
-    FIELD(char, s, [10])
+    FIELD(char, s, [10])      \
+    FIELD(bool, b, )
 GEN_STRUCT(StructA);
 
 /* Nested Struct
@@ -42,7 +43,7 @@ GEN_STRUCT(StructC);
 int main() {
     // initialize variables
     StructC struct_c = {};
-    struct_c.a = (StructA){1, 'K', {2.5, -0.3, 99.9}, "hello"};
+    struct_c.a = (StructA){1, 'K', {2.5, -0.3, 99.9}, "hello", true};
     struct_c.b[0] = (StructB){-555555, struct_c.a, {{}, struct_c.a}};
     char buf[600] = {};
 

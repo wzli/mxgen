@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -106,6 +107,7 @@ static inline void* reverse_memcpy(void* dst, const void* src, size_t n) {
     return dst;
 }
 
+GEN_STRUCT_PRIMITIVE(bool, (*struc) ? "true%c" : "false")
 GEN_STRUCT_PRIMITIVE(char, (*struc) ? "\"%c\"" : "null")
 GEN_STRUCT_PRIMITIVE(uint8_t, "%u")
 GEN_STRUCT_PRIMITIVE(uint16_t, "%u")

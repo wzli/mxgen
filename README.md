@@ -29,12 +29,14 @@ See [Example](./test.c):
 /* For the equivalent struct definition
 typedef struct {
     int32_t int_member;
+    bool bool_member;
     float float_array[5];
     StructB nested_struct;
 }   StructA;
 */
 #define STRUCT_StructA(X)      \
     X(int32_t, int_member, )   \
+    X(bool, bool_member, )     \
     X(float, float_array, [5]) \
     X(StructB, nested_struct, )
 GEN_STRUCT(StructA);
@@ -56,7 +58,7 @@ gcc test.c
 ```
 Output:
 ```json
-{"i":"1", "d":["2.5", "0.3", "99.9"], "c":"hello"}
+{"i":"1", "d":["2.5", "0.3", "99.9"], "s":"hello", "b":true}
 ```
 
 ## Limitations
