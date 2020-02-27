@@ -68,4 +68,4 @@ Output:
 - Pointers members are not supported.
 - Variable Length Arrays are not supported.
 - Use fixed-sized char arrays to store strings.
-- Primitive fields use *stdint.h* aliases only (+char). Eg: use **int32_t** instead of **int**
+- Primitive fields use *stdint.h* aliases only (except char and bool). Eg: use **int32_t** instead of **int**

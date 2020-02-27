@@ -16,7 +16,7 @@
 
 #define GEN_STRUCT_COMPARE_FIELD(TYPE, NAME, ARRAY)                           \
     for (size_t i = 0; !result && i < sizeof(TYPE ARRAY) / sizeof(TYPE); ++i) \
-        result |= TYPE##_compare((TYPE*) &a->NAME + i, (TYPE*) &b->NAME + i);
+        result = TYPE##_compare((TYPE*) &a->NAME + i, (TYPE*) &b->NAME + i);
 
 #define GEN_STRUCT_SERIALIZE_FIELD(TYPE, NAME, ARRAY)              \
     for (size_t i = 0; i < sizeof(TYPE ARRAY) / sizeof(TYPE); ++i) \
