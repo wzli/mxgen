@@ -61,16 +61,14 @@
     }                                                                \
     buf[--len - 1] = ']';
 
-#define GEN_STRUCT_JSON_FIELD(TYPE, NAME, ARRAY)                   \
-    len += sprintf(buf + len, "\"" #NAME "\":");                   \
-    if (is_char(#TYPE)) {                                          \
-        len += sprintf(buf + len, "\"%s\"", (char*) &struc->NAME); \
-    } else if (sizeof(TYPE ARRAY) == sizeof(TYPE)) {               \
-        len += TYPE##_to_json((TYPE*) &struc->NAME, buf + len);    \
-    } else {                                                       \
-        GEN_STRUCT_JSON_FIELD_LIST(TYPE, NAME, ARRAY);             \
-    }                                                              \
-    buf[len++] = ',';                                              \
+#define GEN_STRUCT_JSON_FIELD(TYPE, NAME, ARRAY)                \
+    len += sprintf(buf + len, "\"" #NAME "\":");                \
+    if (sizeof(TYPE ARRAY) == sizeof(TYPE) || is_char(#TYPE)) { \
+        len += TYPE##_to_json((TYPE*) &struc->NAME, buf + len); \
+    } else {                                                    \
+        GEN_STRUCT_JSON_FIELD_LIST(TYPE, NAME, ARRAY);          \
+    }                                                           \
+    buf[len++] = ',';                                           \
     buf[len++] = ' ';
 
 #define GEN_STRUCT_TO_JSON(STRUCT)                                       \
@@ -101,13 +99,9 @@
         return len;                                                                           \
     }
 
-#define GEN_STRUCT_CSV_ENTRY_FIELD(TYPE, NAME, ARRAY)                        \
-    if (is_char(#TYPE)) {                                                    \
-        len += sprintf(buf + len, "\"%s\",", (char*) &struc->NAME);          \
-    } else {                                                                 \
-        for (size_t i = 0; i < sizeof(TYPE ARRAY) / sizeof(TYPE); ++i) {     \
-            len += TYPE##_to_csv_entry((TYPE*) &struc->NAME + i, buf + len); \
-        }                                                                    \
+#define GEN_STRUCT_CSV_ENTRY_FIELD(TYPE, NAME, ARRAY)                                       \
+    for (size_t i = 0; i < (is_char(#TYPE) ? 1 : sizeof(TYPE ARRAY) / sizeof(TYPE)); ++i) { \
+        len += TYPE##_to_csv_entry((TYPE*) &struc->NAME + i, buf + len);                    \
     }
 
 #define GEN_STRUCT_TO_CSV_ENTRY(STRUCT)                                       \
@@ -117,7 +111,7 @@
         return len;                                                           \
     }
 
-#define GEN_STRUCT_PRIMITIVE(TYPE, FORMAT)                                                  \
+#define GEN_STRUCT_PRIMITIVE(TYPE, FORMAT, ...)                                             \
     static inline int TYPE##_serialize(const TYPE* struc, uint8_t* buf) {                   \
         SERIALIZE_MEMCPY(buf, struc, sizeof(TYPE));                                         \
         return sizeof(TYPE);                                                                \
@@ -127,7 +121,7 @@
         return sizeof(TYPE);                                                                \
     }                                                                                       \
     static inline int TYPE##_to_json(const TYPE* struc, char* buf) {                        \
-        return sprintf(buf, FORMAT, *struc);                                                \
+        return sprintf(buf, FORMAT, __VA_ARGS__);                                           \
     }                                                                                       \
     static inline int TYPE##_to_csv_header(char* buf, const char* prefix, int prefix_len) { \
         int len = prefix_len + (prefix - buf);                                              \
@@ -136,7 +130,7 @@
         return len;                                                                         \
     }                                                                                       \
     static inline int TYPE##_to_csv_entry(const TYPE* struc, char* buf) {                   \
-        int len = sprintf(buf, FORMAT, *struc);                                             \
+        int len = sprintf(buf, FORMAT, __VA_ARGS__);                                        \
         buf[len++] = ',';                                                                   \
         buf[len] = '\0';                                                                    \
         return len;                                                                         \
@@ -161,15 +155,15 @@ static inline bool is_char(const char* type) {
     return *(int*) type == (IS_LITTLE_ENDIAN ? 0x72616863 : 0x63686172);  // 'char'
 }
 
-GEN_STRUCT_PRIMITIVE(bool, (*struc) ? "true%c" : "false")
-GEN_STRUCT_PRIMITIVE(char, (*struc) ? "\"%c\"" : "null")
-GEN_STRUCT_PRIMITIVE(uint8_t, "%u")
-GEN_STRUCT_PRIMITIVE(uint16_t, "%u")
-GEN_STRUCT_PRIMITIVE(uint32_t, "%u")
-GEN_STRUCT_PRIMITIVE(uint64_t, "%lu")
-GEN_STRUCT_PRIMITIVE(int8_t, "%d")
-GEN_STRUCT_PRIMITIVE(int16_t, "%d")
-GEN_STRUCT_PRIMITIVE(int32_t, "%d")
-GEN_STRUCT_PRIMITIVE(int64_t, "%ld")
-GEN_STRUCT_PRIMITIVE(float, "%g")
-GEN_STRUCT_PRIMITIVE(double, "%g")
+GEN_STRUCT_PRIMITIVE(bool, "%s", (*struc) ? "true" : "false")
+GEN_STRUCT_PRIMITIVE(char, "\"%s\"", struc)
+GEN_STRUCT_PRIMITIVE(uint8_t, "%u", *struc)
+GEN_STRUCT_PRIMITIVE(uint16_t, "%u", *struc)
+GEN_STRUCT_PRIMITIVE(uint32_t, "%u", *struc)
+GEN_STRUCT_PRIMITIVE(uint64_t, "%lu", *struc)
+GEN_STRUCT_PRIMITIVE(int8_t, "%d", *struc)
+GEN_STRUCT_PRIMITIVE(int16_t, "%d", *struc)
+GEN_STRUCT_PRIMITIVE(int32_t, "%d", *struc)
+GEN_STRUCT_PRIMITIVE(int64_t, "%ld", *struc)
+GEN_STRUCT_PRIMITIVE(float, "%g", *struc)
+GEN_STRUCT_PRIMITIVE(double, "%g", *struc)
