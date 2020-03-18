@@ -52,12 +52,6 @@
         return len;                                                             \
     }
 
-#define GEN_STRUCT_FIELD_STRING(NAME)        \
-    buf[len++] = '"';                        \
-    strcpy(buf + len, (char*) &struc->NAME); \
-    len += strlen((char*) &struc->NAME);     \
-    buf[len++] = '"';
-
 #define GEN_STRUCT_JSON_FIELD_LIST(TYPE, NAME, ARRAY)                \
     buf[len++] = '[';                                                \
     for (size_t i = 0; i < sizeof(TYPE ARRAY) / sizeof(TYPE); ++i) { \
@@ -67,16 +61,16 @@
     }                                                                \
     buf[--len - 1] = ']';
 
-#define GEN_STRUCT_JSON_FIELD(TYPE, NAME, ARRAY)                \
-    len += sprintf(buf + len, "\"" #NAME "\":");                \
-    if (is_char(#TYPE)) {                                       \
-        GEN_STRUCT_FIELD_STRING(NAME);                          \
-    } else if (sizeof(TYPE ARRAY) == sizeof(TYPE)) {            \
-        len += TYPE##_to_json((TYPE*) &struc->NAME, buf + len); \
-    } else {                                                    \
-        GEN_STRUCT_JSON_FIELD_LIST(TYPE, NAME, ARRAY);          \
-    }                                                           \
-    buf[len++] = ',';                                           \
+#define GEN_STRUCT_JSON_FIELD(TYPE, NAME, ARRAY)                   \
+    len += sprintf(buf + len, "\"" #NAME "\":");                   \
+    if (is_char(#TYPE)) {                                          \
+        len += sprintf(buf + len, "\"%s\"", (char*) &struc->NAME); \
+    } else if (sizeof(TYPE ARRAY) == sizeof(TYPE)) {               \
+        len += TYPE##_to_json((TYPE*) &struc->NAME, buf + len);    \
+    } else {                                                       \
+        GEN_STRUCT_JSON_FIELD_LIST(TYPE, NAME, ARRAY);             \
+    }                                                              \
+    buf[len++] = ',';                                              \
     buf[len++] = ' ';
 
 #define GEN_STRUCT_TO_JSON(STRUCT)                                       \
@@ -109,9 +103,7 @@
 
 #define GEN_STRUCT_CSV_ENTRY_FIELD(TYPE, NAME, ARRAY)                        \
     if (is_char(#TYPE)) {                                                    \
-        GEN_STRUCT_FIELD_STRING(NAME);                                       \
-        buf[len++] = ',';                                                    \
-        buf[len] = '\0';                                                     \
+        len += sprintf(buf + len, "\"%s\",", (char*) &struc->NAME);          \
     } else {                                                                 \
         for (size_t i = 0; i < sizeof(TYPE ARRAY) / sizeof(TYPE); ++i) {     \
             len += TYPE##_to_csv_entry((TYPE*) &struc->NAME + i, buf + len); \
