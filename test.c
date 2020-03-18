@@ -48,8 +48,8 @@ int main() {
     char buf[600] = {};
 
     // test serialize and deserialize
-    StructB_serialize(&struct_c.b[0], (uint8_t*)buf);
-    StructB_deserialize(&struct_c.b[1], (uint8_t*)buf);
+    StructB_serialize(&struct_c.b[0], (uint8_t*) buf);
+    StructB_deserialize(&struct_c.b[1], (uint8_t*) buf);
 
     // test comparison
     assert(!StructB_compare(&struct_c.b[0], &struct_c.b[1]));
@@ -60,6 +60,22 @@ int main() {
     StructB_to_json(&struct_c.b[0], buf);
     printf("StructB: %s\n\n", buf);
     StructC_to_json(&struct_c, buf);
-    printf("StructC: %s\n", buf);
+    printf("StructC: %s\n\n", buf);
+
+    // test csv string
+    StructA_to_csv_header(buf, 0, 0);
+    printf("CSV Header A: %s\n", buf);
+    StructA_to_csv_entry(&struct_c.a, buf);
+    printf("CSV Entry A: %s\n\n", buf);
+
+    StructB_to_csv_header(buf, 0, 0);
+    printf("CSV Header B: %s\n", buf);
+    StructB_to_csv_entry(&struct_c.b[0], buf);
+    printf("CSV Entry B: %s\n\n", buf);
+
+    StructC_to_csv_header(buf, 0, 0);
+    printf("CSV Header C: %s\n", buf);
+    StructC_to_csv_entry(&struct_c, buf);
+    printf("CSV Entry C: %s\n", buf);
     return 0;
 }

@@ -1,20 +1,20 @@
 # Minimal X-Macro Generator
 
-Extremely minimal [X-Macros](https://en.wikipedia.org/wiki/X_Macro) to extend C structs with basic cross-platform serialization and JSON string conversion. 
+Extremely minimal [X-Macros](https://en.wikipedia.org/wiki/X_Macro) to extend C structs with basic cross-platform serialization and string conversion.
 
 ## Use Case
 - Originally part of an embedded ecosystem, to facilitate message passing between microcontrollers on top of byte transmission protocols.
-- JSON string generation is primarily intended for automated debug prints and logging, with the added benefit of WebAPI compatibility.
+- JSON and CSV string generation is primarily intended for automated debug prints and data logging.
 - Combine message definition and code generation into concise header files that are portable and easily shared in cross-platform application.
 
 ## Features
 
 - Cross-platform binary serialization.
-- Introspective JSON string conversion.
+- Introspective JSON and CSV string conversion.
 - Comparison operator generation.
 - Supports structs, nested structs, and array members.
 - Header only, just include [mxgen.h](./mxgen.h).
-- Bare minimal, 120 lines of code total.
+- Bare minimal, under 200 lines of code total.
 - No external dependencies.
 - No dynamic memory usage.
 - C99 compliant.
@@ -45,7 +45,9 @@ GEN_STRUCT(StructA);
 int StructA_compare(const StructA* a, const StructA* b);
 int StructA_serialize(const StructA* a, uint8_t* buf);
 int StructA_deserialize(StructA* a, const uint8_t* buf);
-int StructA_to_json(const StructA* a, char*);
+int StructA_to_json(const StructA* a, char* buf);
+int StructA_to_csv_header(char* buf, const char* prefix, int prefix_len);
+int StructA_to_csv_entry(const StructA* a, char* buf);
 ```
 
 ## Demo
@@ -59,6 +61,7 @@ gcc test.c
 Output:
 ```json
 {"i":"1", "d":["2.5", "0.3", "99.9"], "s":"hello", "b":true}
+...
 ```
 
 ## Limitations
