@@ -55,27 +55,43 @@ int main() {
     assert(!StructB_compare(&struct_c.b[0], &struct_c.b[1]));
 
     // test json string
+    puts("StructA:");
     StructA_to_json(&struct_c.a, buf);
-    printf("StructA: %s\n\n", buf);
+    puts(buf);
+    puts("");
+
+    puts("StructB:");
     StructB_to_json(&struct_c.b[0], buf);
-    printf("StructB: %s\n\n", buf);
+    puts(buf);
+    puts("");
+
+    puts("StructC:");
     StructC_to_json(&struct_c, buf);
-    printf("StructC: %s\n\n", buf);
+    puts(buf);
+    puts("");
 
     // test csv string
+    puts("CSV Header A:");
     StructA_to_csv_header(buf, 0, 0);
-    printf("CSV Header A: %s\n", buf);
+    puts(buf);
+    puts("CSV Entry A:");
     StructA_to_csv_entry(&struct_c.a, buf);
-    printf("CSV Entry A: %s\n\n", buf);
+    puts(buf);
+    puts("");
 
+    puts("CSV Header B:");
     StructB_to_csv_header(buf, 0, 0);
-    printf("CSV Header B: %s\n", buf);
+    puts(buf);
+    puts("CSV Entry B:");
     StructB_to_csv_entry(&struct_c.b[0], buf);
-    printf("CSV Entry B: %s\n\n", buf);
+    puts(buf);
+    puts("");
 
+    puts("CSV Header C:");
     StructC_to_csv_header(buf, 0, 0);
-    printf("CSV Header C: %s\n", buf);
+    puts(buf);
+    puts("CSV Entry C:");
     StructC_to_csv_entry(&struct_c, buf);
-    printf("CSV Entry C: %s\n", buf);
+    puts(buf);
     return 0;
 }

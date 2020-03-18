@@ -68,7 +68,7 @@
     buf[--len - 1] = ']';
 
 #define GEN_STRUCT_JSON_FIELD(TYPE, NAME, ARRAY)                \
-    len += sprintf(buf + len, "\"%s\":", #NAME);                \
+    len += sprintf(buf + len, "\"" #NAME "\":");                \
     if (is_char(#TYPE)) {                                       \
         GEN_STRUCT_FIELD_STRING(NAME);                          \
     } else if (sizeof(TYPE ARRAY) == sizeof(TYPE)) {            \
@@ -95,8 +95,8 @@
         prefix = buf + len;                                                                   \
         len += prefix_len;                                                                    \
         int name_len = sizeof(TYPE ARRAY) == sizeof(TYPE) || is_char(#TYPE)                   \
-                               ? sprintf(buf + len, "/" #NAME)                                \
-                               : sprintf(buf + len, "/" #NAME "/%u", i);                      \
+                               ? sprintf(buf + len, #NAME "/")                                \
+                               : sprintf(buf + len, #NAME "/%u/", i);                         \
         len += TYPE##_to_csv_header(buf + len, prefix, prefix_len + name_len);                \
     }
 
@@ -110,7 +110,8 @@
 #define GEN_STRUCT_CSV_ENTRY_FIELD(TYPE, NAME, ARRAY)                        \
     if (is_char(#TYPE)) {                                                    \
         GEN_STRUCT_FIELD_STRING(NAME);                                       \
-        len += sprintf(buf + len, ", ");                                     \
+        buf[len++] = ',';                                                    \
+        buf[len] = '\0';                                                     \
     } else {                                                                 \
         for (size_t i = 0; i < sizeof(TYPE ARRAY) / sizeof(TYPE); ++i) {     \
             len += TYPE##_to_csv_entry((TYPE*) &struc->NAME + i, buf + len); \
@@ -137,11 +138,16 @@
         return sprintf(buf, FORMAT, *struc);                                                \
     }                                                                                       \
     static inline int TYPE##_to_csv_header(char* buf, const char* prefix, int prefix_len) { \
-        return prefix_len + (prefix - buf) + sprintf((char*) prefix + prefix_len, ", ");    \
+        int len = prefix_len + (prefix - buf);                                              \
+        buf[len - 1] = ',';                                                                 \
+        buf[len] = '\0';                                                                    \
+        return len;                                                                         \
     }                                                                                       \
     static inline int TYPE##_to_csv_entry(const TYPE* struc, char* buf) {                   \
         int len = sprintf(buf, FORMAT, *struc);                                             \
-        return len + sprintf(buf + len, ", ");                                              \
+        buf[len++] = ',';                                                                   \
+        buf[len] = '\0';                                                                    \
+        return len;                                                                         \
     }                                                                                       \
     static inline int TYPE##_compare(const TYPE* a, const TYPE* b) { return (int) (*b - *a); }
 
