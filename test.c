@@ -14,7 +14,7 @@ typedef struct {
     FIELD(double, d, [3])     \
     FIELD(char, s, [10])      \
     FIELD(bool, b, )
-GEN_STRUCT(StructA);
+GEN_STRUCT(StructA)
 
 /* Nested Struct
 typedef struct {
@@ -27,7 +27,7 @@ typedef struct {
     FIELD(int32_t, x, )       \
     FIELD(StructA, y, )       \
     FIELD(StructA, z, [2])
-GEN_STRUCT(StructB);
+GEN_STRUCT(StructB)
 
 /* Double Nested Struct
 typedef struct {
@@ -38,14 +38,14 @@ typedef struct {
 #define STRUCT_StructC(FIELD) \
     FIELD(StructA, a, )       \
     FIELD(StructB, b, [2])
-GEN_STRUCT(StructC);
+GEN_STRUCT(StructC)
 
 int main() {
     // initialize variables
-    StructC struct_c = {};
+    StructC struct_c = {0};
     struct_c.a = (StructA){1, 'K', {2.5, -0.3, 99.9}, "hello", true};
-    struct_c.b[0] = (StructB){-555555, struct_c.a, {{}, struct_c.a}};
-    char buf[600] = {};
+    struct_c.b[0] = (StructB){-555555, struct_c.a, {{0}, struct_c.a}};
+    char buf[600] = {0};
 
     // test serialize and deserialize
     StructB_serialize(&struct_c.b[0], (uint8_t*) buf);
@@ -72,7 +72,7 @@ int main() {
 
     // test csv string
     puts("CSV Header A:");
-    StructA_to_csv_header(buf, 0, 0);
+    StructA_to_csv_header(buf, buf, 0);
     puts(buf);
     puts("CSV Entry A:");
     StructA_to_csv_entry(&struct_c.a, buf);
@@ -80,7 +80,7 @@ int main() {
     puts("");
 
     puts("CSV Header B:");
-    StructB_to_csv_header(buf, 0, 0);
+    StructB_to_csv_header(buf, buf, 0);
     puts(buf);
     puts("CSV Entry B:");
     StructB_to_csv_entry(&struct_c.b[0], buf);
@@ -88,7 +88,7 @@ int main() {
     puts("");
 
     puts("CSV Header C:");
-    StructC_to_csv_header(buf, 0, 0);
+    StructC_to_csv_header(buf, buf, 0);
     puts(buf);
     puts("CSV Entry C:");
     StructC_to_csv_entry(&struct_c, buf);
