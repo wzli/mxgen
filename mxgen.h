@@ -84,19 +84,18 @@
 
 #define GEN_STRUCT_CSV_HEADER_FIELD(TYPE, NAME, ARRAY)                                        \
     for (uint32_t i = 0; i < (is_char(#TYPE) ? 1 : sizeof(TYPE ARRAY) / sizeof(TYPE)); ++i) { \
-        buf[len - prefix_len] = '/';                                                          \
+        buf[len - prefix_offset] = '/';                                                       \
         int name_len = sizeof(TYPE ARRAY) == sizeof(TYPE) || is_char(#TYPE)                   \
                                ? sprintf(buf + len, "/" #NAME)                                \
                                : sprintf(buf + len, "/" #NAME "/%u", i);                      \
-        len += TYPE##_to_csv_header(buf + len + name_len, prefix, prefix_len + name_len);     \
-        prefix = buf + len - prefix_len;                                                      \
+        len += TYPE##_to_csv_header(buf + len + name_len, prefix_offset + name_len);          \
     }
 
-#define GEN_STRUCT_TO_CSV_HEADER(STRUCT)                                                      \
-    static inline int STRUCT##_to_csv_header(char* buf, const char* prefix, int prefix_len) { \
-        int len = 0;                                                                          \
-        STRUCT_##STRUCT(GEN_STRUCT_CSV_HEADER_FIELD);                                         \
-        return len;                                                                           \
+#define GEN_STRUCT_TO_CSV_HEADER(STRUCT)                                     \
+    static inline int STRUCT##_to_csv_header(char* buf, int prefix_offset) { \
+        int len = 0;                                                         \
+        STRUCT_##STRUCT(GEN_STRUCT_CSV_HEADER_FIELD);                        \
+        return len;                                                          \
     }
 
 #define GEN_STRUCT_CSV_ENTRY_FIELD(TYPE, NAME, ARRAY)                                       \
@@ -111,30 +110,30 @@
         return len;                                                           \
     }
 
-#define GEN_STRUCT_PRIMITIVE(TYPE, FORMAT, ...)                                             \
-    static inline int TYPE##_serialize(const TYPE* struc, uint8_t* buf) {                   \
-        SERIALIZE_MEMCPY(buf, struc, sizeof(TYPE));                                         \
-        return sizeof(TYPE);                                                                \
-    }                                                                                       \
-    static inline int TYPE##_deserialize(TYPE* struc, const uint8_t* buf) {                 \
-        SERIALIZE_MEMCPY(struc, buf, sizeof(TYPE));                                         \
-        return sizeof(TYPE);                                                                \
-    }                                                                                       \
-    static inline int TYPE##_to_json(const TYPE* struc, char* buf) {                        \
-        return sprintf(buf, FORMAT, __VA_ARGS__);                                           \
-    }                                                                                       \
-    static inline int TYPE##_to_csv_header(char* buf, const char* prefix, int prefix_len) { \
-        memcpy(buf + 1, prefix, prefix_len);                                                \
-        buf[0] = ',';                                                                       \
-        buf[1] = '\0';                                                                      \
-        return prefix_len + 1;                                                              \
-    }                                                                                       \
-    static inline int TYPE##_to_csv_entry(const TYPE* struc, char* buf) {                   \
-        int len = sprintf(buf, FORMAT, __VA_ARGS__);                                        \
-        buf[len++] = ',';                                                                   \
-        buf[len] = '\0';                                                                    \
-        return len;                                                                         \
-    }                                                                                       \
+#define GEN_STRUCT_PRIMITIVE(TYPE, FORMAT, ...)                             \
+    static inline int TYPE##_serialize(const TYPE* struc, uint8_t* buf) {   \
+        SERIALIZE_MEMCPY(buf, struc, sizeof(TYPE));                         \
+        return sizeof(TYPE);                                                \
+    }                                                                       \
+    static inline int TYPE##_deserialize(TYPE* struc, const uint8_t* buf) { \
+        SERIALIZE_MEMCPY(struc, buf, sizeof(TYPE));                         \
+        return sizeof(TYPE);                                                \
+    }                                                                       \
+    static inline int TYPE##_to_json(const TYPE* struc, char* buf) {        \
+        return sprintf(buf, FORMAT, __VA_ARGS__);                           \
+    }                                                                       \
+    static inline int TYPE##_to_csv_header(char* buf, int prefix_offset) {  \
+        memcpy(buf + 1, buf - prefix_offset, prefix_offset);                \
+        buf[0] = ',';                                                       \
+        buf[1] = '\0';                                                      \
+        return prefix_offset + 1;                                           \
+    }                                                                       \
+    static inline int TYPE##_to_csv_entry(const TYPE* struc, char* buf) {   \
+        int len = sprintf(buf, FORMAT, __VA_ARGS__);                        \
+        buf[len++] = ',';                                                   \
+        buf[len] = '\0';                                                    \
+        return len;                                                         \
+    }                                                                       \
     static inline int TYPE##_compare(const TYPE* a, const TYPE* b) { return (int) (*b - *a); }
 
 #define IS_LITTLE_ENDIAN \
