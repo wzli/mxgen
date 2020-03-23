@@ -46,7 +46,7 @@ int StructA_compare(const StructA* a, const StructA* b);
 int StructA_serialize(const StructA* a, uint8_t* buf);
 int StructA_deserialize(StructA* a, const uint8_t* buf);
 int StructA_to_json(const StructA* a, char* buf);
-int StructA_to_csv_header(char* buf, const char* prefix, int prefix_len);
+int StructA_to_csv_header(int prefix_offset, char* buf);
 int StructA_to_csv_entry(const StructA* a, char* buf);
 ```
 

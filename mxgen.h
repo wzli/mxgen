@@ -84,15 +84,15 @@
 
 #define GEN_STRUCT_CSV_HEADER_FIELD(TYPE, NAME, ARRAY)                                        \
     for (uint32_t i = 0; i < (is_char(#TYPE) ? 1 : sizeof(TYPE ARRAY) / sizeof(TYPE)); ++i) { \
-        buf[len - prefix_offset] = '/';                                                       \
         int name_len = sizeof(TYPE ARRAY) == sizeof(TYPE) || is_char(#TYPE)                   \
-                               ? sprintf(buf + len, "/" #NAME)                                \
-                               : sprintf(buf + len, "/" #NAME "/%u", i);                      \
-        len += TYPE##_to_csv_header(buf + len + name_len, prefix_offset + name_len);          \
+                               ? sprintf(buf + len + prefix_offset, "/" #NAME)                \
+                               : sprintf(buf + len + prefix_offset, "/" #NAME "/%u", i);      \
+        buf[len] = '/';                                                                       \
+        len += TYPE##_to_csv_header(prefix_offset + name_len, buf + len);                     \
     }
 
 #define GEN_STRUCT_TO_CSV_HEADER(STRUCT)                                     \
-    static inline int STRUCT##_to_csv_header(char* buf, int prefix_offset) { \
+    static inline int STRUCT##_to_csv_header(int prefix_offset, char* buf) { \
         int len = 0;                                                         \
         STRUCT_##STRUCT(GEN_STRUCT_CSV_HEADER_FIELD);                        \
         return len;                                                          \
@@ -122,10 +122,10 @@
     static inline int TYPE##_to_json(const TYPE* struc, char* buf) {        \
         return sprintf(buf, FORMAT, __VA_ARGS__);                           \
     }                                                                       \
-    static inline int TYPE##_to_csv_header(char* buf, int prefix_offset) {  \
-        memcpy(buf + 1, buf - prefix_offset, prefix_offset);                \
-        buf[0] = ',';                                                       \
-        buf[1] = '\0';                                                      \
+    static inline int TYPE##_to_csv_header(int prefix_offset, char* buf) {  \
+        memcpy(buf + 1 + prefix_offset, buf, prefix_offset);                \
+        buf[prefix_offset] = ',';                                           \
+        buf[prefix_offset + 1] = '\0';                                      \
         return prefix_offset + 1;                                           \
     }                                                                       \
     static inline int TYPE##_to_csv_entry(const TYPE* struc, char* buf) {   \

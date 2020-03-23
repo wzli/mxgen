@@ -72,7 +72,7 @@ int main() {
 
     // test csv string
     puts("CSV Header A:");
-    StructA_to_csv_header(buf, buf, 0);
+    StructA_to_csv_header(0, buf);
     puts(buf);
     puts("CSV Entry A:");
     StructA_to_csv_entry(&struct_c.a, buf);
@@ -80,7 +80,7 @@ int main() {
     puts("");
 
     puts("CSV Header B:");
-    StructB_to_csv_header(buf, buf, 0);
+    StructB_to_csv_header(0, buf);
     puts(buf);
     puts("CSV Entry B:");
     StructB_to_csv_entry(&struct_c.b[0], buf);
@@ -88,7 +88,7 @@ int main() {
     puts("");
 
     puts("CSV Header C:");
-    StructC_to_csv_header(buf, buf, 0);
+    StructC_to_csv_header(0, buf);
     puts(buf);
     puts("CSV Entry C:");
     StructC_to_csv_entry(&struct_c, buf);
