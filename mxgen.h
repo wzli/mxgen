@@ -84,13 +84,12 @@
 
 #define GEN_STRUCT_CSV_HEADER_FIELD(TYPE, NAME, ARRAY)                                        \
     for (uint32_t i = 0; i < (is_char(#TYPE) ? 1 : sizeof(TYPE ARRAY) / sizeof(TYPE)); ++i) { \
-        memcpy(buf + len, prefix, prefix_len);                                                \
-        prefix = buf + len;                                                                   \
-        len += prefix_len;                                                                    \
+        buf[len - prefix_len] = '/';                                                          \
         int name_len = sizeof(TYPE ARRAY) == sizeof(TYPE) || is_char(#TYPE)                   \
-                               ? sprintf(buf + len, #NAME "/")                                \
-                               : sprintf(buf + len, #NAME "/%u/", i);                         \
-        len += TYPE##_to_csv_header(buf + len, prefix, prefix_len + name_len);                \
+                               ? sprintf(buf + len, "/" #NAME)                                \
+                               : sprintf(buf + len, "/" #NAME "/%u", i);                      \
+        len += TYPE##_to_csv_header(buf + len + name_len, prefix, prefix_len + name_len);     \
+        prefix = buf + len - prefix_len;                                                      \
     }
 
 #define GEN_STRUCT_TO_CSV_HEADER(STRUCT)                                                      \
@@ -125,10 +124,10 @@
         return sprintf(buf, FORMAT, __VA_ARGS__);                                           \
     }                                                                                       \
     static inline int TYPE##_to_csv_header(char* buf, const char* prefix, int prefix_len) { \
-        int len = prefix_len + (prefix - buf);                                              \
-        buf[len - 1] = ',';                                                                 \
-        buf[len] = '\0';                                                                    \
-        return len;                                                                         \
+        memcpy(buf + 1, prefix, prefix_len);                                                \
+        buf[0] = ',';                                                                       \
+        buf[1] = '\0';                                                                      \
+        return prefix_len + 1;                                                              \
     }                                                                                       \
     static inline int TYPE##_to_csv_entry(const TYPE* struc, char* buf) {                   \
         int len = sprintf(buf, FORMAT, __VA_ARGS__);                                        \
