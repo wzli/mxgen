@@ -11,12 +11,12 @@ Extremely minimal [X-Macros](https://en.wikipedia.org/wiki/X_Macro) to extend C 
 
 - Cross-platform binary serialization.
 - Introspective JSON and CSV string conversion.
-- Comparison operator generation.
-- Supports structs, nested structs, and array members.
+- Supports nested structs, unions, and arrays.
+- Ignored fields enable integration with internal data structures.
 - Header only, just include [mxgen.h](./mxgen.h).
 - Bare minimal, under 200 lines of code total.
 - No external dependencies.
-- No dynamic memory usage.
+- No dynamic memory allocation.
 - C99 compliant.
 
 
@@ -30,16 +30,18 @@ See [Example](./test.c):
 typedef struct {
     int32_t int_member;
     bool bool_member;
+    void* ignored_member; <-- this field will not be serialized
     float float_array[5];
     StructB nested_struct;
-}   StructA;
+} StructA;
 */
-#define STRUCT_StructA(X)      \
+#define TYPEDEF_StructA(X, _)  \
     X(int32_t, int_member, )   \
     X(bool, bool_member, )     \
+    _(void*, ignored_member, ) \
     X(float, float_array, [5]) \
     X(StructB, nested_struct, )
-GEN_STRUCT(StructA);
+GEN_STRUCT(StructA)
 
 // the following functions are automatically generated 
 int StructA_compare(const StructA* a, const StructA* b);
@@ -64,11 +66,10 @@ Output:
 ...
 ```
 
-## Limitations
+## Limitations (ignored fields are exempt)
 
-- Only structs are supported.
-- Nested structs must be generated prior to parent struct.
+- Nested structs/unions must be generated prior to parent struct/union.
+- Complex floats are not supported.
 - Pointers members are not supported.
-- Variable Length Arrays are not supported.
-- Use fixed-sized char arrays to store strings.
-- Primitive fields use *stdint.h* aliases only (except char and bool). Eg: use **int32_t** instead of **int**
+- Strings as fixed-sized char arrays only.
+- Integer fields use *stdint.h* aliases only. Eg: use **int32_t** instead of **int**

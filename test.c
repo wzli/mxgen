@@ -8,11 +8,12 @@ typedef struct {
     char c[10]
 } StructA;
 */
-#define STRUCT_StructA(FIELD) \
-    FIELD(uint8_t, i, )       \
-    FIELD(char, c, )          \
-    FIELD(double, d, [3])     \
-    FIELD(char, s, [10])      \
+#define TYPEDEF_StructA(FIELD, IGNORE) \
+    FIELD(uint8_t, i, )                \
+    FIELD(char, c, )                   \
+    IGNORE(void*, ignore, [5])         \
+    FIELD(double, d, [3])              \
+    FIELD(char, s, [10])               \
     FIELD(bool, b, )
 GEN_STRUCT(StructA)
 
@@ -23,9 +24,9 @@ typedef struct {
     StructA z[2];
 } StructB;
 */
-#define STRUCT_StructB(FIELD) \
-    FIELD(int32_t, x, )       \
-    FIELD(StructA, y, )       \
+#define TYPEDEF_StructB(FIELD, _) \
+    FIELD(int32_t, x, )           \
+    FIELD(StructA, y, )           \
     FIELD(StructA, z, [2])
 GEN_STRUCT(StructB)
 
@@ -35,15 +36,16 @@ typedef struct {
     StructB b[2];
 } StructC;
 */
-#define STRUCT_StructC(FIELD) \
-    FIELD(StructA, a, )       \
+#define TYPEDEF_StructC(FIELD, _) \
+    FIELD(StructA, a, )           \
     FIELD(StructB, b, [2])
 GEN_STRUCT(StructC)
+
 
 int main() {
     // initialize variables
     StructC struct_c = {0};
-    struct_c.a = (StructA){1, 'K', {2.5, -0.3, 99.9}, "hello", true};
+    struct_c.a = (StructA){1, 'K', {0}, {2.5, -0.3, 99.9}, "hello", true};
     struct_c.b[0] = (StructB){-555555, struct_c.a, {{0}, struct_c.a}};
     char buf[600] = {0};
 
@@ -93,5 +95,6 @@ int main() {
     puts("CSV Entry C:");
     StructC_to_csv_entry(&struct_c, buf);
     puts(buf);
+
     return 0;
 }

@@ -14,10 +14,13 @@
     GEN_STRUCT_TO_CSV_ENTRY(STRUCT)  \
     GEN_STRUCT_TO_JSON(STRUCT)
 
+#define GEN_IGNORE_FIELD(TYPE, NAME, ARRAY)
+
 #define GEN_STRUCT_FIELD(TYPE, NAME, ARRAY) TYPE NAME ARRAY;
-#define GEN_STRUCT_DEFINITION(STRUCT)     \
-    typedef struct {                      \
-        STRUCT_##STRUCT(GEN_STRUCT_FIELD) \
+
+#define GEN_STRUCT_DEFINITION(STRUCT)                        \
+    typedef struct {                                         \
+        TYPEDEF_##STRUCT(GEN_STRUCT_FIELD, GEN_STRUCT_FIELD) \
     } STRUCT
 
 #define GEN_STRUCT_COMPARE_FIELD(TYPE, NAME, ARRAY)                           \
@@ -35,21 +38,21 @@
 #define GEN_STRUCT_COMPARE(STRUCT)                                         \
     static inline int STRUCT##_compare(const STRUCT* a, const STRUCT* b) { \
         int result = 0;                                                    \
-        STRUCT_##STRUCT(GEN_STRUCT_COMPARE_FIELD);                         \
+        TYPEDEF_##STRUCT(GEN_STRUCT_COMPARE_FIELD, GEN_IGNORE_FIELD);      \
         return result;                                                     \
     }
 
 #define GEN_STRUCT_SERIALIZE(STRUCT)                                          \
     static inline int STRUCT##_serialize(const STRUCT* struc, uint8_t* buf) { \
         int len = 0;                                                          \
-        STRUCT_##STRUCT(GEN_STRUCT_SERIALIZE_FIELD);                          \
+        TYPEDEF_##STRUCT(GEN_STRUCT_SERIALIZE_FIELD, GEN_IGNORE_FIELD);       \
         return len;                                                           \
     }
 
 #define GEN_STRUCT_DESERIALIZE(STRUCT)                                          \
     static inline int STRUCT##_deserialize(STRUCT* struc, const uint8_t* buf) { \
         int len = 0;                                                            \
-        STRUCT_##STRUCT(GEN_STRUCT_DESERIALIZE_FIELD);                          \
+        TYPEDEF_##STRUCT(GEN_STRUCT_DESERIALIZE_FIELD, GEN_IGNORE_FIELD);       \
         return len;                                                             \
     }
 
@@ -76,7 +79,7 @@
     static inline int STRUCT##_to_json(const STRUCT* struc, char* buf) { \
         int len = 0;                                                     \
         buf[len++] = '{';                                                \
-        STRUCT_##STRUCT(GEN_STRUCT_JSON_FIELD);                          \
+        TYPEDEF_##STRUCT(GEN_STRUCT_JSON_FIELD, GEN_IGNORE_FIELD);       \
         buf[len - 2] = '}';                                              \
         buf[--len] = '\0';                                               \
         return len;                                                      \
@@ -94,7 +97,7 @@
 #define GEN_STRUCT_TO_CSV_HEADER(STRUCT)                                     \
     static inline int STRUCT##_to_csv_header(int prefix_offset, char* buf) { \
         int len = 0;                                                         \
-        STRUCT_##STRUCT(GEN_STRUCT_CSV_HEADER_FIELD);                        \
+        TYPEDEF_##STRUCT(GEN_STRUCT_CSV_HEADER_FIELD, GEN_IGNORE_FIELD);     \
         return len;                                                          \
     }
 
@@ -106,7 +109,7 @@
 #define GEN_STRUCT_TO_CSV_ENTRY(STRUCT)                                       \
     static inline int STRUCT##_to_csv_entry(const STRUCT* struc, char* buf) { \
         int len = 0;                                                          \
-        STRUCT_##STRUCT(GEN_STRUCT_CSV_ENTRY_FIELD);                          \
+        TYPEDEF_##STRUCT(GEN_STRUCT_CSV_ENTRY_FIELD, GEN_IGNORE_FIELD);       \
         return len;                                                           \
     }
 
