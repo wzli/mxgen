@@ -26,15 +26,15 @@ See [Example](./test.c):
 ```C
 #include "mxgen.h"
 
-/* For the equivalent struct definition
+// For the equivalent struct definition
 typedef struct {
     int32_t int_member;
     bool bool_member;
-    void* ignored_member; <-- don't serialize this
+    void* ignored_member; // <-- don't serialize this
     float float_array[5];
     StructB nested_struct;
 } StructA;
-*/
+
 #define TYPEDEF_StructA(X, _)  \
     X(int32_t, int_member, )   \
     X(bool, bool_member, )     \
@@ -66,8 +66,8 @@ Output:
 ...
 ```
 
-## Limitations (ignored fields are exempt)
-
+## Limitations
+**ignored fields are exempt**
 - Nested structs/unions must be generated prior to parent struct/union.
 - Complex floats are not supported.
 - Pointers members are not supported.
