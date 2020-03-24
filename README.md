@@ -30,7 +30,7 @@ See [Example](./test.c):
 typedef struct {
     int32_t int_member;
     bool bool_member;
-    void* ignored_member; <-- this field will not be serialized
+    void* ignored_member; <-- don't serialize this
     float float_array[5];
     StructB nested_struct;
 } StructA;
@@ -38,10 +38,10 @@ typedef struct {
 #define TYPEDEF_StructA(X, _)  \
     X(int32_t, int_member, )   \
     X(bool, bool_member, )     \
-    _(void*, ignored_member, ) \
+    _(void*, ignored_member, ) \ <-- field is ignored
     X(float, float_array, [5]) \
     X(StructB, nested_struct, )
-GEN_STRUCT(StructA)
+MXGEN(struct, StructA) <-- for union, ensure all fields are ignored but 1
 
 // the following functions are automatically generated 
 int StructA_compare(const StructA* a, const StructA* b);

@@ -15,7 +15,7 @@ typedef struct {
     FIELD(double, d, [3])              \
     FIELD(char, s, [10])               \
     FIELD(bool, b, )
-GEN_STRUCT(StructA)
+MXGEN(struct, StructA)
 
 /* Nested Struct
 typedef struct {
@@ -28,7 +28,7 @@ typedef struct {
     FIELD(int32_t, x, )           \
     FIELD(StructA, y, )           \
     FIELD(StructA, z, [2])
-GEN_STRUCT(StructB)
+MXGEN(struct, StructB)
 
 /* Double Nested Struct
 typedef struct {
@@ -39,8 +39,7 @@ typedef struct {
 #define TYPEDEF_StructC(FIELD, _) \
     FIELD(StructA, a, )           \
     FIELD(StructB, b, [2])
-GEN_STRUCT(StructC)
-
+MXGEN(struct, StructC)
 
 int main() {
     // initialize variables

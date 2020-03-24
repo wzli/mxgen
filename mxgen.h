@@ -5,23 +5,21 @@
 #include <stdio.h>
 #include <string.h>
 
-#define GEN_STRUCT(STRUCT)           \
-    GEN_STRUCT_DEFINITION(STRUCT);   \
-    GEN_STRUCT_COMPARE(STRUCT)       \
-    GEN_STRUCT_SERIALIZE(STRUCT)     \
-    GEN_STRUCT_DESERIALIZE(STRUCT)   \
-    GEN_STRUCT_TO_CSV_HEADER(STRUCT) \
-    GEN_STRUCT_TO_CSV_ENTRY(STRUCT)  \
+#define MXGEN(TYPE, STRUCT)             \
+    GEN_STRUCT_DEFINITION(TYPE, STRUCT) \
+    GEN_STRUCT_COMPARE(STRUCT)          \
+    GEN_STRUCT_SERIALIZE(STRUCT)        \
+    GEN_STRUCT_DESERIALIZE(STRUCT)      \
+    GEN_STRUCT_TO_CSV_HEADER(STRUCT)    \
+    GEN_STRUCT_TO_CSV_ENTRY(STRUCT)     \
     GEN_STRUCT_TO_JSON(STRUCT)
 
 #define GEN_IGNORE_FIELD(TYPE, NAME, ARRAY)
 
 #define GEN_STRUCT_FIELD(TYPE, NAME, ARRAY) TYPE NAME ARRAY;
 
-#define GEN_STRUCT_DEFINITION(STRUCT)                        \
-    typedef struct {                                         \
-        TYPEDEF_##STRUCT(GEN_STRUCT_FIELD, GEN_STRUCT_FIELD) \
-    } STRUCT
+#define GEN_STRUCT_DEFINITION(TYPE, STRUCT) \
+    typedef TYPE{TYPEDEF_##STRUCT(GEN_STRUCT_FIELD, GEN_STRUCT_FIELD)} STRUCT;
 
 #define GEN_STRUCT_COMPARE_FIELD(TYPE, NAME, ARRAY)                           \
     for (size_t i = 0; !result && i < sizeof(TYPE ARRAY) / sizeof(TYPE); ++i) \
