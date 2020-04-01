@@ -67,9 +67,9 @@ Output:
 ```
 
 ## Limitations
-**ignored fields are exempt**
+**Ignored fields are exempt**
 - Nested structs/unions must be generated prior to parent struct/union.
 - Complex floats are not supported.
 - Pointers members are not supported.
 - Strings as fixed-sized char arrays only.
-- Integer fields use *stdint.h* aliases only. Eg: use **int32_t** instead of **int**
+- Integer fields use `stdint.h` aliases only. Eg: use `int32_t` instead of `int`
