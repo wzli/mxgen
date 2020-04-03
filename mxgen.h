@@ -157,11 +157,11 @@ static inline bool is_char(const char* type) {
 
 GEN_STRUCT_PRIMITIVE(bool, "%s", (*struc) ? "true" : "false")
 GEN_STRUCT_PRIMITIVE(char, "\"%s\"", struc)
-GEN_STRUCT_PRIMITIVE(uint8_t, "%" PRIu8, *struc)
+GEN_STRUCT_PRIMITIVE(uint8_t, "%u", *struc)
 GEN_STRUCT_PRIMITIVE(uint16_t, "%" PRIu16, *struc)
 GEN_STRUCT_PRIMITIVE(uint32_t, "%" PRIu32, *struc)
 GEN_STRUCT_PRIMITIVE(uint64_t, "%" PRIu64, *struc)
-GEN_STRUCT_PRIMITIVE(int8_t, "%" PRId8, *struc)
+GEN_STRUCT_PRIMITIVE(int8_t, "%d", *struc)
 GEN_STRUCT_PRIMITIVE(int16_t, "%" PRId16, *struc)
 GEN_STRUCT_PRIMITIVE(int32_t, "%" PRId32, *struc)
 GEN_STRUCT_PRIMITIVE(int64_t, "%" PRId64, *struc)
