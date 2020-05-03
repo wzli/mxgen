@@ -1,5 +1,6 @@
 #pragma once
 #include <inttypes.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -165,5 +166,5 @@ GEN_STRUCT_PRIMITIVE(int8_t, "%d", *struc)
 GEN_STRUCT_PRIMITIVE(int16_t, "%" PRId16, *struc)
 GEN_STRUCT_PRIMITIVE(int32_t, "%" PRId32, *struc)
 GEN_STRUCT_PRIMITIVE(int64_t, "%" PRId64, *struc)
-GEN_STRUCT_PRIMITIVE(float, "%g", (double) *struc)
-GEN_STRUCT_PRIMITIVE(double, "%g", *struc)
+GEN_STRUCT_PRIMITIVE(float, isnormal(*struc) ? "%g" : "\"%g\"", (double) *struc)
+GEN_STRUCT_PRIMITIVE(double, isnormal(*struc) ? "%g" : "\"%g\"", *struc)
